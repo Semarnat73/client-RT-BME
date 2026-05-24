@@ -1,0 +1,20 @@
+import numpy as np
+import pandas as pd
+
+class Procesamiento:
+
+    def __init__(self, fs=1000): 
+        self.fs = fs
+
+    def procesar(self, samples):
+        fft = np.fft.fft(samples)
+        frecuencia = np.fft.fftfreq(len(samples), d=1/self.fs)
+        indices_fft = np.where(frecuencia > 0)
+        f_positivo = frecuencia[indices_fft]
+        magnitudes = np.abs(fft[indices_fft])
+
+        f_dominante = f_positivo[np.argmax(magnitudes)]
+        array_data = pd.Series(samples)
+        window_size = max(1, int(f_dominante))
+        media_movil = array_data.rolling(window=window_size).mean()
+        return media_movil
